@@ -144,30 +144,25 @@ jobs:
           path: newman-report.html
           if-no-files-found: warn
 
-      # 17. Final status check — fail the job if any test step failed
-      - name: Final status check
+      - name: Pipeline summary
         if: always()
         run: |
-          FAILED=0
-          if [ "${{ steps.newman.outcome }}" = "failure" ]; then
-            echo "❌ Newman tests failed"
-            FAILED=1
-          fi
-          if [ "${{ steps.bruno.outcome }}" = "failure" ]; then
-            echo "❌ Bruno tests failed"
-            FAILED=1
-          fi
-          if [ "${{ steps.pytest.outcome }}" = "failure" ]; then
-            echo "❌ pytest tests failed"
-            FAILED=1
-          fi
-          if [ "${{ steps.robot.outcome }}" = "failure" ]; then
-            echo "❌ Robot Framework tests failed"
-            FAILED=1
-          fi
-          if [ "$FAILED" = "1" ]; then
+          echo "## Test Suite Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Newman | ${{ steps.newman.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bruno | ${{ steps.bruno.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| pytest | ${{ steps.pytest.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Robot Framework | ${{ steps.robot.outcome }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail job if any suite failed
+        if: always()
+        run: |
+          if [ "${{ steps.newman.outcome }}" = "failure" ] ||
+             [ "${{ steps.bruno.outcome }}" = "failure" ] ||
+             [ "${{ steps.pytest.outcome }}" = "failure" ] ||
+             [ "${{ steps.robot.outcome }}" = "failure" ]; then
             echo "One or more test suites failed"
             exit 1
-          else
-            echo "✅ All test suites passed"
           fi
+
