@@ -1,0 +1,36 @@
+meta {
+  name: Post Cart Valid
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/cart
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "productId": 1,
+    "quantity": 2
+  }
+}
+
+tests {
+  test("Status code is 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (res.getStatus() === 201 && data && data.id) {
+    bru.setEnvVar("cartItemId", String(data.id), { persist: true });
+  }
+}

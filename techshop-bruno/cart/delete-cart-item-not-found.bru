@@ -1,0 +1,22 @@
+meta {
+  name: Delete Cart Item Not Found
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/cart/99999
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

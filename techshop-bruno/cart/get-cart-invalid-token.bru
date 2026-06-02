@@ -1,0 +1,22 @@
+meta {
+  name: Get Cart Invalid Token
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/cart
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer invalid-token-xyz
+}
+
+tests {
+  test("Status code is 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

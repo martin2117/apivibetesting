@@ -1,0 +1,22 @@
+meta {
+  name: Delete Cart Invalid Item Id
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/cart/abc
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

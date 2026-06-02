@@ -1,0 +1,27 @@
+meta {
+  name: Put Cart No Auth
+  type: http
+  seq: 20
+}
+
+put {
+  url: {{baseUrl}}/cart/1
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "quantity": 3
+  }
+}
+
+tests {
+  test("Status code is 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Products Valid
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/products
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+tests {
+  test("Status code is 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

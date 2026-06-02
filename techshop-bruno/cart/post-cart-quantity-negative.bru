@@ -1,0 +1,29 @@
+meta {
+  name: Post Cart Quantity Negative
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/cart
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "productId": 1,
+    "quantity": -1
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

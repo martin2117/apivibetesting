@@ -1,0 +1,44 @@
+meta {
+  name: Post Order Invalid Product Id
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "items": [
+      {
+        "productId": 99999,
+        "quantity": 1
+      }
+    ],
+    "shipping": {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane@example.com",
+      "phone": "0412345678"
+    },
+    "payment": {
+      "cardNumber": "4111111111111111",
+      "expiryDate": "12/28",
+      "cvv": "123"
+    }
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Put Cart Quantity Zero
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{baseUrl}}/cart/{{cartItemId}}
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "quantity": 0
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

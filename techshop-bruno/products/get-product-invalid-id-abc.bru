@@ -1,0 +1,21 @@
+meta {
+  name: Get Product Invalid Id Abc
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/products/abc
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Products Missing Id
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/products/
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Login Unknown User
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "email": "unknown@example.com",
+    "password": "password123"
+  }
+}
+
+tests {
+  test("Status code is 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Product Invalid Id Negative
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/products/-1
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

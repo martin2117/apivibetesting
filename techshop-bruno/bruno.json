@@ -2,5 +2,10 @@
   "version": "1",
   "name": "TechShop API Tests",
   "type": "collection",
-  "ignore": []
+  "ignore": [],
+  "presets": {
+    "requestType": "http",
+    "requestUrl": "http://localhost:3000",
+    "environment": "local"
+  }
 }

@@ -1,0 +1,22 @@
+meta {
+  name: Get Cart Malformed Auth
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/cart
+  body: none
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer
+}
+
+tests {
+  test("Status code is 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

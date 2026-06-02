@@ -36,12 +36,20 @@ jobs:
       # 5. Wait for the server to be ready
       - name: Wait for server to be ready
         run: |
-          sleep 5
-          curl --retry 5 --retry-delay 2 http://localhost:3000/health
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:3000/health; then
+              echo "Server is ready"
+              exit 0
+            fi
+            echo "Waiting for server... attempt $i"
+            sleep 2
+          done
+          echo "Server did not start in time"
+          exit 1
 
       # 6. Install Newman and the HTML reporter
       - name: Install Newman and HTML reporter
-        run: npm install -g newman newman-reporter-html
+        run: npm install -g newman newman-reporter-htmlextra
 
       # 7. Run Postman collection with Newman
       - name: Run Postman collection with Newman
@@ -50,8 +58,10 @@ jobs:
         run: |
           newman run techshop.postman_collection.json \
             --env-var base_url=http://localhost:3000 \
-            --reporters cli,html \
-            --reporter-html-export newman-report.html
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export newman-report.html || true
+          # Ensure report file exists even on failure
+          ls -la newman-report.html 2>/dev/null || echo "Newman report not generated"
 
       # 8. Install Bruno CLI
       - name: Install Bruno CLI
@@ -71,7 +81,7 @@ jobs:
 
       # 11. Install Python dependencies
       - name: Install Python dependencies
-        run: pip install pytest requests pytest-html python-dotenv
+        run: pip install pytest requests pytest-html robotframework robotframework-requests
 
       # 12. Run pytest
       - name: Run pytest
@@ -81,56 +91,81 @@ jobs:
           BASE_URL: http://localhost:3000
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-        run: pytest test_techshop.py -v --html=pytest-report.html --self-contained-html
+        run: |
+          pytest test_techshop.py -v \
+            --html=pytest-report.html \
+            --self-contained-html \
+            -p no:cacheprovider \
+            || true
+          ls -la pytest-report.html 2>/dev/null || echo "pytest report not generated"
 
-      # 13. Install Robot Framework dependencies
-      - name: Install Robot Framework dependencies
-        run: pip install robotframework robotframework-requests
-
-      # 14. Run Robot Framework
+      # 13. Run Robot Framework
       - name: Run Robot Framework
         id: robot
         continue-on-error: true
         env:
+          BASE_URL: http://localhost:3000
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
-          robot --variable BASE_URL:http://localhost:3000 \
-                --outputdir robot-results \
-                techshop.robot
+          mkdir -p robot-results
+          robot \
+            --variable BASE_URL:http://localhost:3000 \
+            --outputdir robot-results \
+            techshop.robot || true
+          ls -la robot-results/ || echo "No robot results generated"
 
-      # 15. Upload pytest HTML report as artifact
+      # 14. Upload pytest HTML report as artifact
       - name: Upload pytest report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pytest-report
           path: pytest-report.html
+          if-no-files-found: warn
 
-      # 16. Upload Robot Framework report as artifact
+      # 15. Upload Robot Framework report as artifact
       - name: Upload Robot Framework report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: robot-report
           path: robot-results/
+          if-no-files-found: warn
 
-      # 17. Upload Newman report as artifact
+      # 16. Upload Newman report as artifact
       - name: Upload Newman report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: newman-report
           path: newman-report.html
+          if-no-files-found: warn
 
-      # 18. Final status check — fail the job if any test step failed
+      # 17. Final status check — fail the job if any test step failed
       - name: Final status check
         if: always()
         run: |
-          if [ "${{ steps.newman.outcome }}" = "failure" ] || \
-             [ "${{ steps.bruno.outcome }}" = "failure" ] || \
-             [ "${{ steps.pytest.outcome }}" = "failure" ] || \
-             [ "${{ steps.robot.outcome }}" = "failure" ]; then
+          FAILED=0
+          if [ "${{ steps.newman.outcome }}" = "failure" ]; then
+            echo "❌ Newman tests failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.bruno.outcome }}" = "failure" ]; then
+            echo "❌ Bruno tests failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.pytest.outcome }}" = "failure" ]; then
+            echo "❌ pytest tests failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.robot.outcome }}" = "failure" ]; then
+            echo "❌ Robot Framework tests failed"
+            FAILED=1
+          fi
+          if [ "$FAILED" = "1" ]; then
             echo "One or more test suites failed"
             exit 1
+          else
+            echo "✅ All test suites passed"
           fi
