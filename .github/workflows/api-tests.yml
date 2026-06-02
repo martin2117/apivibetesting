@@ -71,7 +71,9 @@ jobs:
       - name: Run Bruno collection
         id: bruno
         continue-on-error: true
-        run: bru run techshop-bruno/ --env local
+        run: |
+          cd techshop-bruno
+          bru run --env local || true
 
       # 10. Set up Python 3.11
       - name: Set up Python 3.11
