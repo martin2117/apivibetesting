@@ -5,10 +5,11 @@
 |--------|-------------|
 | Prompt 1 — Generate the Full CI Workflow | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
 | Prompt 2 — Fix Pipeline from GitHub Annotations | **Section 10, Clip 3** — Debugging the Pipeline |
-| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 5** — Running on the Fixed App |
+| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 6** — Running on the Fixed App in CI |
 | Prompt 4 — Commit and Push Workflow to GitHub | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
 | Prompt 5 — Add GitHub Secrets for Credentials | **Section 10, Clip 3** — Debugging the Pipeline |
 | Prompt 6 — Add Fail-on-Failure Check and Summary | **Section 10, Clip 4** — Making the Pipeline Fail on Test Failures |
+| Prompt 7 — Verify All Suites Locally Against Fixed App | **Section 10, Clip 5** — Verifying Locally Before Touching the Pipeline |
 
 ---
 
@@ -137,7 +138,7 @@ repository variables, and what values they should have.
 ---
 
 ## Prompt 3: Switch to Fixed App in CI
-*Used in: Section 10, Clip 5 — "Running on the Fixed App"*
+*Used in: Section 10, Clip 6 — "Running on the Fixed App in CI"*
 
 ```
 Update .github/workflows/api-tests.yml to run against the fixed app instead
@@ -235,4 +236,48 @@ Update .github/workflows/api-tests.yml to do two things:
        echo "| Bruno | ${{ steps.bruno.outcome }} |" >> $GITHUB_STEP_SUMMARY
        echo "| pytest | ${{ steps.pytest.outcome }} |" >> $GITHUB_STEP_SUMMARY
        echo "| Robot Framework | ${{ steps.robot.outcome }} |" >> $GITHUB_STEP_SUMMARY
+```
+
+---
+
+## Prompt 7: Verify All Suites Locally Against Fixed App
+*Used in: Section 10, Clip 5 — "Verifying Locally Before Touching the Pipeline"*
+
+```
+Help me switch from the broken app to the fixed app and verify all four
+test suites pass locally before I update the pipeline.
+Run each step in the terminal and wait for my confirmation before continuing.
+
+1. Stop the running broken app server (kill the background process):
+   pkill -f "node.*broken-app" || true
+
+2. Start the fixed app:
+   cd techshop-api/fixed-app && npm install && npm start &
+   Wait 3 seconds, then verify it is up:
+   curl -s http://localhost:3000/health
+   The response should show "environment":"fixed" — if not, stop and tell me.
+
+3. Run Newman:
+   newman run techshop.postman_collection.json \
+     --env-var base_url=http://localhost:3000 \
+     --reporters cli
+   Report how many tests passed and failed.
+
+4. Run Bruno:
+   bru run techshop-bruno/ --env local
+   Report how many tests passed and failed.
+
+5. Run pytest:
+   pytest test_techshop.py -v
+   Report how many tests passed and failed.
+
+6. Run Robot Framework:
+   robot --variable BASE_URL:http://localhost:3000 techshop.robot
+   Report how many tests passed and failed.
+
+7. Give me a final summary table:
+   | Suite | Passed | Failed |
+   If any suite has failures, show me the failing test names and
+   what the assertion expected versus what it got, so I can debug
+   before touching the pipeline.
 ```
