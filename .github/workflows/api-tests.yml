@@ -1,0 +1,136 @@
+name: TechShop API Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  api-tests:
+    name: api-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js 20
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Install TechShop API dependencies
+      - name: Install TechShop API dependencies
+        run: npm install
+        working-directory: techshop-api/broken-app
+
+      # 4. Start the TechShop API in the background
+      - name: Start the TechShop API
+        run: node techshop-api/broken-app/server.js &
+
+      # 5. Wait for the server to be ready
+      - name: Wait for server to be ready
+        run: |
+          sleep 5
+          curl --retry 5 --retry-delay 2 http://localhost:3000/health
+
+      # 6. Install Newman and the HTML reporter
+      - name: Install Newman and HTML reporter
+        run: npm install -g newman newman-reporter-html
+
+      # 7. Run Postman collection with Newman
+      - name: Run Postman collection with Newman
+        id: newman
+        continue-on-error: true
+        run: |
+          newman run techshop.postman_collection.json \
+            --env-var base_url=http://localhost:3000 \
+            --reporters cli,html \
+            --reporter-html-export newman-report.html
+
+      # 8. Install Bruno CLI
+      - name: Install Bruno CLI
+        run: npm install -g @usebruno/cli
+
+      # 9. Run Bruno collection
+      - name: Run Bruno collection
+        id: bruno
+        continue-on-error: true
+        run: bru run techshop-bruno/ --env local
+
+      # 10. Set up Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 11. Install Python dependencies
+      - name: Install Python dependencies
+        run: pip install pytest requests pytest-html python-dotenv
+
+      # 12. Run pytest
+      - name: Run pytest
+        id: pytest
+        continue-on-error: true
+        env:
+          BASE_URL: http://localhost:3000
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        run: pytest test_techshop.py -v --html=pytest-report.html --self-contained-html
+
+      # 13. Install Robot Framework dependencies
+      - name: Install Robot Framework dependencies
+        run: pip install robotframework robotframework-requests
+
+      # 14. Run Robot Framework
+      - name: Run Robot Framework
+        id: robot
+        continue-on-error: true
+        env:
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        run: |
+          robot --variable BASE_URL:http://localhost:3000 \
+                --outputdir robot-results \
+                techshop.robot
+
+      # 15. Upload pytest HTML report as artifact
+      - name: Upload pytest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: pytest-report.html
+
+      # 16. Upload Robot Framework report as artifact
+      - name: Upload Robot Framework report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-report
+          path: robot-results/
+
+      # 17. Upload Newman report as artifact
+      - name: Upload Newman report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman-report.html
+
+      # 18. Final status check — fail the job if any test step failed
+      - name: Final status check
+        if: always()
+        run: |
+          if [ "${{ steps.newman.outcome }}" = "failure" ] || \
+             [ "${{ steps.bruno.outcome }}" = "failure" ] || \
+             [ "${{ steps.pytest.outcome }}" = "failure" ] || \
+             [ "${{ steps.robot.outcome }}" = "failure" ]; then
+            echo "One or more test suites failed"
+            exit 1
+          fi
