@@ -3,14 +3,16 @@
 ## Course reference
 | Prompt | Used in clip |
 |--------|-------------|
-| Prompt 1 — Generate the Full CI Workflow | **Section 10, Clip 2** — Cursor Writes the .yml File |
+| Prompt 1 — Generate the Full CI Workflow | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
 | Prompt 2 — Add Branch Protection Instructions | **Section 10, Clip 4** — Failing the Build and Publishing Reports |
 | Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 3** — Running All Four Suites in CI |
+| Prompt 4 — Commit and Push Workflow to GitHub | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
+| Prompt 5 — Add GitHub Secrets for Credentials | **Section 10, Clip 3** — Running All Four Suites in CI |
 
 ---
 
 ## Prompt 1: Generate the Full CI Workflow
-*Used in: Section 10, Clip 2 — "Cursor Writes the .yml File"*
+*Used in: Section 10, Clip 2 — "Antigravity IDE Writes the .yml File"*
 
 ```
 Create a GitHub Actions workflow file at .github/workflows/api-tests.yml.
@@ -136,4 +138,56 @@ Update .github/workflows/api-tests.yml to run against the fixed app instead
 of the broken app. Change the npm install path and the server start command
 to use techshop-api/fixed-app instead of techshop-api/broken-app.
 All other steps stay the same.
+```
+
+---
+
+## Prompt 4: Commit and Push Workflow to GitHub
+*Used in: Section 10, Clip 2 — "Antigravity IDE Writes the .yml File"*
+
+```
+Help me commit the new GitHub Actions workflow file and push it to GitHub.
+Run each step in the terminal and wait for my confirmation before continuing.
+
+1. Check what files have changed:
+   git status
+
+2. Stage the workflow file:
+   git add .github/workflows/api-tests.yml
+
+3. Commit with a clear message:
+   git commit -m "Add GitHub Actions workflow to run all API test suites"
+
+4. Push to the main branch:
+   git push origin main
+
+5. Tell me to open the Actions tab on my GitHub repository to watch
+   the first workflow run trigger automatically
+```
+
+---
+
+## Prompt 5: Add GitHub Secrets for Credentials
+*Used in: Section 10, Clip 3 — "Running All Four Suites in CI"*
+
+```
+Guide me through adding the test credentials as GitHub repository secrets
+so the CI pipeline can authenticate with the TechShop API securely.
+
+1. Explain that I need to add two secrets to my GitHub repository:
+   - TEST_EMAIL  (the email used to log into the TechShop API)
+   - TEST_PASSWORD  (the password for that account)
+
+2. Give me the exact navigation path in GitHub:
+   Repository → Settings → Secrets and variables → Actions → New repository secret
+
+3. Tell me to add TEST_EMAIL first, then TEST_PASSWORD
+
+4. Confirm that secrets are never visible in logs or workflow output
+   once they are saved — GitHub masks them automatically
+
+5. Show me how they are referenced in the workflow file:
+   env:
+     TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+     TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 ```

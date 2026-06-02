@@ -3,16 +3,16 @@
 ## Course reference
 | Prompt | Used in clip |
 |--------|-------------|
-| Prompt 1 — Generate Bug Reports from pytest Output | **Section 11, Clip 2** — Cursor Writes the Bug Reports |
-| Prompt 2 — Generate Bug Reports from Newman Output | **Section 11, Clip 2** — Cursor Writes the Bug Reports |
-| Prompt 3 — Format as Jira Tickets | **Section 11, Clip 2** — Cursor Writes the Bug Reports |
+| Prompt 1 — Generate Bug Reports from pytest Output | **Section 11, Clip 2** — Antigravity IDE Writes the Bug Reports |
+| Prompt 2 — Generate Bug Reports from Newman Output | **Section 11, Clip 2** — Antigravity IDE Writes the Bug Reports |
+| Prompt 3 — Format as Jira Tickets | **Section 11, Clip 2** — Antigravity IDE Writes the Bug Reports |
 
 ---
 
 ## Prompt 1: Generate Bug Reports from pytest Output
-*Used in: Section 11, Clip 2 — "Cursor Writes the Bug Reports"*
+*Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
-Paste this prompt into Cursor along with your pytest failure output.
+Paste this prompt into the Antigravity IDE chat along with your pytest failure output.
 
 ```
 I am going to paste the output from a failed pytest run against the TechShop API.
@@ -43,7 +43,7 @@ Here is the pytest output:
 ---
 
 ## Prompt 2: Generate Bug Reports from Newman Output
-*Used in: Section 11, Clip 2 — "Cursor Writes the Bug Reports"*
+*Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
 ```
 I am going to paste the output from a Newman CLI run against the TechShop API.
@@ -61,7 +61,7 @@ Newman output:
 ---
 
 ## Prompt 3: Format as Jira Tickets
-*Used in: Section 11, Clip 2 — "Cursor Writes the Bug Reports"*
+*Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
 ```
 Take the five bug reports we just created and reformat each one as a

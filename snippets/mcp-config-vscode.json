@@ -5,7 +5,7 @@
       "command": "npx",
       "args": ["-y", "@postman/mcp-server"],
       "env": {
-        "POSTMAN_API_KEY": "PASTE_YOUR_POSTMAN_API_KEY_HERE"
+        "POSTMAN_API_KEY": "YOUR_KEY_HERE"
       }
     }
   }

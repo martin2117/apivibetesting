@@ -1,67 +1,105 @@
-# Credentials Setup — Keep Secrets Out of Your Code
+# Environment Variables Setup
 
-All test suites in this course read credentials from environment variables.
-Never hardcode usernames, passwords, or tokens in test files, prompts, or commits.
+All secrets and configuration values are stored as shell environment variables —
+never in any file inside the project folder.
+
+**Why not .env?** Cursor indexes your entire project folder. Any file inside it,
+including .env, is visible to the AI. Shell profiles live in your home directory,
+outside the project — Cursor cannot read them.
 
 ---
 
-## Local development — .env file
+## All variables used in this course
 
-1. Copy `.env.example` to a new file called `.env` in your project root:
+Copy the exports from `snippets/shell-env-setup.sh` into your shell profile.
+
+| Variable | What it is |
+|----------|-----------|
+| `BASE_URL` | TechShop API base URL (default: http://localhost:3000) |
+| `TEST_EMAIL` | Login email for the TechShop API |
+| `TEST_PASSWORD` | Login password for the TechShop API |
+| `POSTMAN_API_KEY` | Postman API key for the MCP server (Section 5) |
+
+---
+
+## Mac / Linux
+
+Open your shell profile:
 
 ```bash
-cp snippets/.env.example .env
+# zsh (default on Mac)
+open ~/.zshrc
+
+# bash
+open ~/.bashrc
 ```
 
-2. Open `.env` and fill in your values:
+Paste all exports from `snippets/shell-env-setup.sh` at the bottom, fill in real values, save, then reload:
 
-```
-BASE_URL=http://localhost:3000
-TEST_EMAIL=demo@techshop.com
-TEST_PASSWORD=password123
+```bash
+source ~/.zshrc   # or source ~/.bashrc
 ```
 
-3. Confirm `.env` is in your `.gitignore` (it is included in `snippets/.gitignore`).
-   This prevents credentials from ever being committed to Git.
+Verify:
+
+```bash
+echo $BASE_URL
+echo $TEST_EMAIL
+echo $TEST_PASSWORD
+echo $POSTMAN_API_KEY
+```
 
 ---
 
-## How each tool reads the .env file
+## Windows
+
+1. Open **Start → Edit the system environment variables**
+2. Click **Environment Variables**
+3. Under **User variables**, add each variable:
+   - `BASE_URL` = `http://localhost:3000`
+   - `TEST_EMAIL` = your email
+   - `TEST_PASSWORD` = your password
+   - `POSTMAN_API_KEY` = your Postman API key
+4. Click OK, then restart your terminal and IDE
+
+---
+
+## GitHub Actions (CI)
+
+In CI, variables come from GitHub Secrets — not from shell profiles or files.
+
+1. Go to your repository → **Settings → Secrets and variables → Actions**
+2. Add each as a repository secret:
+   - `TEST_EMAIL`
+   - `TEST_PASSWORD`
+
+`BASE_URL` is set directly in the workflow file (`http://localhost:3000`) since
+the test server runs inside the CI job and is not a secret.
+`POSTMAN_API_KEY` is not needed in CI — Newman uses the exported collection file.
+
+---
+
+## How each tool reads variables
 
 ### Python (pytest)
 
-Install python-dotenv:
-
-```bash
-pip install python-dotenv
-```
-
-At the top of `test_techshop.py`:
+Variables are read directly from the environment — no .env file, no dotenv:
 
 ```python
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL", "http://localhost:3000")
-```
 
-In fixtures:
-
-```python
 @pytest.fixture
 def auth_token():
     email = os.getenv("TEST_EMAIL")
     password = os.getenv("TEST_PASSWORD")
     if not email or not password:
-        raise ValueError("TEST_EMAIL and TEST_PASSWORD must be set in .env")
+        raise ValueError("TEST_EMAIL and TEST_PASSWORD must be set as environment variables")
     ...
 ```
 
 ### Robot Framework
-
-Robot Framework reads environment variables with `%{VAR_NAME}`:
 
 ```robot
 *** Variables ***
@@ -70,63 +108,20 @@ ${EMAIL}       %{TEST_EMAIL}
 ${PASSWORD}    %{TEST_PASSWORD}
 ```
 
-Load the `.env` file before running:
+### Postman MCP config
 
-```bash
-# Mac / Linux — export variables from .env before running robot
-export $(cat .env | xargs) && robot techshop.robot
+The config file references the variable from the environment — no value stored in the file:
 
-# Or use the dotenv CLI tool:
-pip install dotenv-cli
-dotenv run -- robot techshop.robot
-```
-
-### Bruno
-
-Bruno reads environment variables from its environment files (`local.bru`).
-Set `authToken` via the post-request script after login — never put it directly
-in the environment file.
-
-For the base URL, use the `local.bru` environment file (not tracked in Git
-if you add `techshop-bruno/environments/local.bru` to `.gitignore`):
-
-```
-vars {
-  baseUrl: http://localhost:3000
-  authToken:
+```json
+{
+  "mcpServers": {
+    "postman": {
+      "command": "npx",
+      "args": ["-y", "@postman/mcp-server"],
+      "env": {
+        "POSTMAN_API_KEY": "${POSTMAN_API_KEY}"
+      }
+    }
+  }
 }
 ```
-
-### Postman
-
-In Postman, credentials live in environment variables set via the GUI —
-never in the collection JSON that gets committed to Git.
-
-Create a Postman environment called `Local` with variables:
-- `base_url` = `http://localhost:3000`
-
-The `authToken` variable is set automatically by the login request's
-post-request script — it is never stored in a committed file.
-
----
-
-## CI — GitHub Actions Secrets
-
-In GitHub Actions, credentials come from repository secrets, not from `.env`.
-
-1. Go to your GitHub repository → **Settings** → **Secrets and variables** → **Actions**
-2. Click **New repository secret** and add:
-   - `TEST_EMAIL`
-   - `TEST_PASSWORD`
-
-3. Reference them in your workflow file:
-
-```yaml
-env:
-  BASE_URL: http://localhost:3000
-  TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
-  TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-```
-
-The `.env` file is never used in CI. Secrets are injected at runtime by GitHub
-and are never visible in logs or artifacts.

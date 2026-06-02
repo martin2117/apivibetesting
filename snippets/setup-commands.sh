@@ -28,6 +28,10 @@ pip install pytest requests pytest-html
 pytest --version
 python3 -c "import requests; print('requests', requests.__version__)"
 
+# Note: python-dotenv is NOT installed — all environment variables are set
+# in your shell profile (~/.zshrc / ~/.bashrc), not in a .env file.
+# See snippets/shell-env-setup.sh and snippets/env-setup.md.
+
 # ─── Robot Framework ──────────────────────────────────────────────────────────
 
 pip install robotframework robotframework-requests
