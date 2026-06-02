@@ -59,7 +59,7 @@ jobs:
           newman run techshop.postman_collection.json \
             --env-var base_url=http://localhost:3000 \
             --reporters cli,htmlextra \
-            --reporter-htmlextra-export newman-report.html || true
+            --reporter-htmlextra-export newman-report.html
           # Ensure report file exists even on failure
           ls -la newman-report.html 2>/dev/null || echo "Newman report not generated"
 
@@ -73,7 +73,7 @@ jobs:
         continue-on-error: true
         run: |
           cd techshop-bruno
-          bru run --env local || true
+          bru run --env local
 
       # 10. Set up Python 3.11
       - name: Set up Python 3.11
@@ -97,8 +97,7 @@ jobs:
           pytest test_techshop.py -v \
             --html=pytest-report.html \
             --self-contained-html \
-            -p no:cacheprovider \
-            || true
+            -p no:cacheprovider
           ls -la pytest-report.html 2>/dev/null || echo "pytest report not generated"
 
       # 13. Run Robot Framework
@@ -114,7 +113,7 @@ jobs:
           robot \
             --variable BASE_URL:http://localhost:3000 \
             --outputdir robot-results \
-            techshop.robot || true
+            techshop.robot
           ls -la robot-results/ || echo "No robot results generated"
 
       # 14. Upload pytest HTML report as artifact
