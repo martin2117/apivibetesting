@@ -4,10 +4,11 @@
 | Prompt | Used in clip |
 |--------|-------------|
 | Prompt 1 — Generate the Full CI Workflow | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
-| Prompt 2 — Add Branch Protection Instructions | **Section 10, Clip 4** — Failing the Build and Publishing Reports |
-| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 3** — Running All Four Suites in CI |
+| Prompt 2 — Fix Pipeline from GitHub Annotations | **Section 10, Clip 3** — Debugging the Pipeline |
+| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 5** — Running on the Fixed App |
 | Prompt 4 — Commit and Push Workflow to GitHub | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
-| Prompt 5 — Add GitHub Secrets for Credentials | **Section 10, Clip 3** — Running All Four Suites in CI |
+| Prompt 5 — Add GitHub Secrets for Credentials | **Section 10, Clip 3** — Debugging the Pipeline |
+| Prompt 6 — Add Fail-on-Failure Check and Summary | **Section 10, Clip 4** — Making the Pipeline Fail on Test Failures |
 
 ---
 
@@ -119,19 +120,24 @@ Steps in order:
 
 ---
 
-## Prompt 2: Add Branch Protection Instructions
-*Used in: Section 10, Clip 4 — "Failing the Build and Publishing Reports"*
+## Prompt 2: Fix Pipeline from GitHub Annotations
+*Used in: Section 10, Clip 3 — "Debugging the Pipeline"*
 
 ```
-Write a step-by-step guide (as a markdown file called BRANCH_PROTECTION.md)
-explaining how to configure GitHub branch protection on the main branch
-to require the api-tests workflow to pass before merging a pull request.
+I have a failing GitHub Actions run. Here are the error annotations
+from the failed run:
+
+[PASTE YOUR ANNOTATIONS HERE]
+
+Read the errors and fix .github/workflows/api-tests.yml so the pipeline
+runs correctly. Tell me if I also need to add any GitHub Secrets or
+repository variables, and what values they should have.
 ```
 
 ---
 
 ## Prompt 3: Switch to Fixed App in CI
-*Used in: Section 10, Clip 3 — "Running All Four Suites in CI"*
+*Used in: Section 10, Clip 5 — "Running on the Fixed App"*
 
 ```
 Update .github/workflows/api-tests.yml to run against the fixed app instead
@@ -168,7 +174,7 @@ Run each step in the terminal and wait for my confirmation before continuing.
 ---
 
 ## Prompt 5: Add GitHub Secrets for Credentials
-*Used in: Section 10, Clip 3 — "Running All Four Suites in CI"*
+*Used in: Section 10, Clip 3 — "Debugging the Pipeline"*
 
 ```
 Guide me through adding the test credentials as GitHub repository secrets
@@ -190,4 +196,43 @@ so the CI pipeline can authenticate with the TechShop API securely.
    env:
      TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+```
+
+---
+
+## Prompt 6: Add Fail-on-Failure Check and Pipeline Summary
+*Used in: Section 10, Clip 4 — "Making the Pipeline Fail on Test Failures"*
+
+```
+Update .github/workflows/api-tests.yml to do two things:
+
+1. Add a final step that fails the overall job if any test suite failed.
+   Each runner step (newman, bruno, pytest, robot) uses continue-on-error: true
+   so they all run even if one fails. The final step should check the outcome
+   of each and exit 1 if any returned failure:
+
+   - name: Fail job if any suite failed
+     if: always()
+     run: |
+       if [ "${{ steps.newman.outcome }}" = "failure" ] ||
+          [ "${{ steps.bruno.outcome }}" = "failure" ] ||
+          [ "${{ steps.pytest.outcome }}" = "failure" ] ||
+          [ "${{ steps.robot.outcome }}" = "failure" ]; then
+         echo "One or more test suites failed"
+         exit 1
+       fi
+
+2. Add a summary step that runs before the fail check (if: always()) and
+   writes a clean status table to the GitHub Actions job summary panel:
+
+   - name: Pipeline summary
+     if: always()
+     run: |
+       echo "## Test Suite Results" >> $GITHUB_STEP_SUMMARY
+       echo "| Suite | Result |" >> $GITHUB_STEP_SUMMARY
+       echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+       echo "| Newman | ${{ steps.newman.outcome }} |" >> $GITHUB_STEP_SUMMARY
+       echo "| Bruno | ${{ steps.bruno.outcome }} |" >> $GITHUB_STEP_SUMMARY
+       echo "| pytest | ${{ steps.pytest.outcome }} |" >> $GITHUB_STEP_SUMMARY
+       echo "| Robot Framework | ${{ steps.robot.outcome }} |" >> $GITHUB_STEP_SUMMARY
 ```
