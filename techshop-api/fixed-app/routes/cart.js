@@ -76,6 +76,10 @@ router.post('/', authenticate, (req, res) => {
     return res.status(400).json({ error: 'productId and quantity are required' });
   }
 
+  if (!Number.isInteger(productId)) {
+    return res.status(400).json({ error: 'productId must be an integer' });
+  }
+
   if (!Number.isInteger(quantity) || quantity < 1) {
     return res.status(400).json({ error: 'Quantity must be a whole number of at least 1' });
   }
@@ -90,13 +94,16 @@ router.post('/', authenticate, (req, res) => {
   }
 
   const cart = getCart(req.user.id);
-  const existing = cart.find(item => item.productId === product.id);
+  let existing = cart.find(item => item.productId === product.id);
+  let itemId;
 
   if (existing) {
     existing.quantity += quantity;
+    itemId = existing.id;
   } else {
+    itemId = Date.now();
     cart.push({
-      id: Date.now(),
+      id: itemId,
       productId: product.id,
       name: product.name,
       price: product.price,
@@ -105,7 +112,7 @@ router.post('/', authenticate, (req, res) => {
   }
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  res.status(201).json({ items: cart, total: parseFloat(total.toFixed(2)) });
+  res.status(201).json({ id: itemId, items: cart, total: parseFloat(total.toFixed(2)) });
 });
 
 /**

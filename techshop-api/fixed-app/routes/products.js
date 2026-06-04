@@ -26,6 +26,10 @@ const router = express.Router();
  *                 $ref: '#/components/schemas/Product'
  */
 router.get('/', (req, res) => {
+  if (req.originalUrl.split('?')[0].endsWith('/')) {
+    return res.status(404).json({ error: 'Product ID not specified' });
+  }
+
   const { category } = req.query;
 
   let result = products;
@@ -34,6 +38,11 @@ router.get('/', (req, res) => {
   }
 
   res.json(result.map(p => ({ ...p, inStock: p.stock > 0 })));
+});
+
+router.all('/', (req, res) => {
+  res.setHeader('Allow', 'GET');
+  res.status(405).json({ error: `Method ${req.method} not allowed on /products` });
 });
 
 /**

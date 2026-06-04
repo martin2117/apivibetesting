@@ -27,11 +27,11 @@ jobs:
       # 3. Install TechShop API dependencies
       - name: Install TechShop API dependencies
         run: npm install
-        working-directory: techshop-api/broken-app
+        working-directory: techshop-api/fixed-app
 
       # 4. Start the TechShop API in the background
       - name: Start the TechShop API
-        run: node techshop-api/broken-app/server.js &
+        run: node techshop-api/fixed-app/server.js &
 
       # 5. Wait for the server to be ready
       - name: Wait for server to be ready

@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticate } = require('../middleware/auth');
+const products = require('../data/products');
 
 const router = express.Router();
 
@@ -116,8 +117,27 @@ router.get('/', authenticate, (req, res) => {
 router.post('/', authenticate, (req, res) => {
   const { items, shipping, payment } = req.body;
 
-  if (!items || !items.length) {
+  if (!items || !Array.isArray(items) || !items.length) {
     return res.status(400).json({ error: 'Order must contain at least one item' });
+  }
+
+  // Validate and populate each item in the order
+  for (const item of items) {
+    if (item.productId === undefined || item.quantity === undefined) {
+      return res.status(400).json({ error: 'Each order item must contain productId and quantity' });
+    }
+    if (!Number.isInteger(item.productId)) {
+      return res.status(400).json({ error: 'productId must be an integer' });
+    }
+    if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+      return res.status(400).json({ error: 'quantity must be an integer of at least 1' });
+    }
+    const product = products.find(p => p.id === item.productId);
+    if (!product) {
+      return res.status(400).json({ error: `Product with ID ${item.productId} not found` });
+    }
+    item.price = product.price;
+    item.name = product.name;
   }
 
   if (!shipping || !shipping.firstName || !shipping.lastName || !shipping.email || !shipping.phone) {

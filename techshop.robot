@@ -99,7 +99,7 @@ Get Products Filtered By Invalid Category Returns Empty Array Or 400
     ${status}=      Set Variable    ${response.status_code}
     Should Be True    ${status} == 200 or ${status} == 400
     Run Keyword If    ${status} == 200
-    ...    Should Be Equal    ${response.json()}    ${EMPTY LIST}
+    ...    Should Be Empty    ${response.json()}
 
 Get Products With Unsupported Query Param Stays Valid
     [Tags]    products    negative
