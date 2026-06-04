@@ -12,12 +12,21 @@
 ## Prompt 1: Generate Bug Reports from pytest Output
 *Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
-Paste this prompt into the Antigravity IDE chat along with your pytest failure output.
-
 ```
-I am going to paste the output from a failed pytest run against the TechShop API.
+First, check if the TechShop API is running on localhost:3000:
+  curl -s http://localhost:3000/health
+If you get a connection error — start it:
+  cd techshop-api/broken-app && npm start &
+Wait 3 seconds, then verify: curl -s http://localhost:3000/health
+If it still fails, stop and tell me.
 
-For each failing test, write a structured bug report with the following fields:
+Once the server is confirmed running:
+
+1. Run the pytest test suite and capture the output:
+   pytest test_techshop.py -v
+   Wait for the run to complete.
+
+2. For each failing test, write a structured bug report with:
 
   Title: one sentence describing what is wrong
   Environment: TechShop API broken-app v1.0.0, localhost:3000
@@ -35,9 +44,6 @@ Use this severity guide:
 Important: if the steps to reproduce require credentials, write them as
 placeholder variables (e.g. {{TEST_EMAIL}}, {{TEST_PASSWORD}}) —
 never include real credentials in a bug report.
-
-Here is the pytest output:
-[PASTE YOUR PYTEST OUTPUT HERE]
 ```
 
 ---
@@ -46,16 +52,26 @@ Here is the pytest output:
 *Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
 ```
-I am going to paste the output from a Newman CLI run against the TechShop API.
+First, check if the TechShop API is running on localhost:3000:
+  curl -s http://localhost:3000/health
+If you get a connection error — start it:
+  cd techshop-api/broken-app && npm start &
+Wait 3 seconds, then verify: curl -s http://localhost:3000/health
+If it still fails, stop and tell me.
 
-For each failing assertion, write a structured bug report with:
+Once the server is confirmed running:
+
+1. Run the Newman collection and capture the output:
+   newman run techshop.postman_collection.json \
+     --env-var base_url=http://localhost:3000 \
+     --reporters cli
+   Wait for the run to complete.
+
+2. For each failing assertion, write a structured bug report with:
   Title, Environment, Steps to Reproduce, Expected Result, Actual Result, Severity
 
 If the steps to reproduce require credentials, use placeholder variables
 (e.g. {{TEST_EMAIL}}, {{TEST_PASSWORD}}) rather than real values.
-
-Newman output:
-[PASTE YOUR NEWMAN OUTPUT HERE]
 ```
 
 ---
@@ -64,7 +80,7 @@ Newman output:
 *Used in: Section 11, Clip 2 — "Antigravity IDE Writes the Bug Reports"*
 
 ```
-Take the five bug reports we just created and reformat each one as a
+Take the bug reports we just created and reformat each one as a
 Jira-style ticket with these fields:
   Summary (max 80 characters)
   Description
