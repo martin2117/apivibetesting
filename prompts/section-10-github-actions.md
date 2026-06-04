@@ -5,11 +5,12 @@
 |--------|-------------|
 | Prompt 1 — Generate the Full CI Workflow | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
 | Prompt 2 — Fix Pipeline from GitHub Annotations | **Section 10, Clip 3** — Debugging the Pipeline |
-| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 6** — Running on the Fixed App in CI |
+| Prompt 3 — Switch to Fixed App in CI | **Section 10, Clip 7** — Running on the Fixed App in CI |
 | Prompt 4 — Commit and Push Workflow to GitHub | **Section 10, Clip 2** — Antigravity IDE Writes the .yml File |
 | Prompt 5 — Add GitHub Secrets for Credentials | **Section 10, Clip 3** — Debugging the Pipeline |
 | Prompt 6 — Add Fail-on-Failure Check and Summary | **Section 10, Clip 4** — Making the Pipeline Fail on Test Failures |
 | Prompt 7 — Verify All Suites Locally Against Fixed App | **Section 10, Clip 5** — Verifying Locally Before Touching the Pipeline |
+| Prompt 8 — Triage Failures and Fix | **Section 10, Clip 5** — Verifying Locally Before Touching the Pipeline |
 
 ---
 
@@ -138,13 +139,20 @@ repository variables, and what values they should have.
 ---
 
 ## Prompt 3: Switch to Fixed App in CI
-*Used in: Section 10, Clip 6 — "Running on the Fixed App in CI"*
+*Used in: Section 10, Clip 7 — "Running on the Fixed App in CI"*
 
 ```
 Update .github/workflows/api-tests.yml to run against the fixed app instead
 of the broken app. Change the npm install path and the server start command
 to use techshop-api/fixed-app instead of techshop-api/broken-app.
 All other steps stay the same.
+
+Then commit and push the change:
+1. git add .
+2. git commit -m "Switch CI pipeline to fixed app"
+3. git push origin main
+
+Tell me to open the Actions tab on my GitHub repository to watch the run.
 ```
 
 ---
@@ -280,4 +288,37 @@ Run each step in the terminal and wait for my confirmation before continuing.
    If any suite has failures, show me the failing test names and
    what the assertion expected versus what it got, so I can debug
    before touching the pipeline.
+```
+
+---
+
+## Prompt 8: Triage Failures and Fix
+*Used in: Section 10, Clip 5 — "Verifying Locally Before Touching the Pipeline"*
+
+Run this prompt after Prompt 7 if there are still failures.
+
+```
+Thank you. I can see there are some failures. Look at each failing test
+and decide:
+
+- Is this a bug in the application that should be fixed in the app code?
+- Or is this a bug in the test itself — wrong expected value, wrong
+  endpoint, or an assertion that does not match the spec?
+
+For each failure:
+1. State which it is (app bug or test bug) and explain why
+2. Read swagger.json to verify what the spec says the correct behaviour
+   should be
+3. Prepare the fix — either update the relevant source file in
+   techshop-api/fixed-app, or update the test file
+4. Apply the fix
+
+Once all fixes are applied, rerun the full test suite:
+   pytest test_techshop.py -v
+   newman run techshop.postman_collection.json --env-var base_url=http://localhost:3000
+   bru run techshop-bruno/ --env local
+   robot --variable BASE_URL:http://localhost:3000 techshop.robot
+
+Report the final pass/fail count for each suite. Repeat until everything
+is green.
 ```
