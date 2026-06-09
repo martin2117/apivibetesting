@@ -1,4 +1,4 @@
-# Section 11 — API Bug Reports with AI
+# Section 11 — Bug Reports, Best Practices and Refactoring with AI
 
 ## Course reference
 | Prompt | Used in clip |
