@@ -18,4 +18,23 @@ tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
   });
+  test("Product has all required schema fields", function () {
+    const p = res.getBody();
+    expect(p).to.have.property("id");
+    expect(p).to.have.property("name");
+    expect(p).to.have.property("description");
+    expect(p).to.have.property("price");
+    expect(p).to.have.property("category");
+    expect(p).to.have.property("stock");
+    expect(p).to.have.property("inStock");
+  });
+  test("Field types match swagger schema", function () {
+    const p = res.getBody();
+    expect(p.id).to.be.a("number");
+    expect(p.name).to.be.a("string");
+    expect(p.price).to.be.a("number");
+    expect(p.category).to.be.a("string");
+    expect(p.stock).to.be.a("number");
+    expect(typeof p.inStock).to.equal("boolean");
+  });
 }

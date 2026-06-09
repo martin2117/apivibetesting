@@ -94,7 +94,7 @@ jobs:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         run: |
-          pytest test_techshop.py -v \
+          pytest tests/ -v \
             --html=pytest-report.html \
             --self-contained-html \
             -p no:cacheprovider
@@ -113,7 +113,7 @@ jobs:
           robot \
             --variable BASE_URL:http://localhost:3000 \
             --outputdir robot-results \
-            techshop.robot
+            tests/
           ls -la robot-results/ || echo "No robot results generated"
 
       # 14. Upload pytest HTML report as artifact

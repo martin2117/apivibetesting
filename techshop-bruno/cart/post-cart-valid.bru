@@ -26,11 +26,19 @@ tests {
   test("Status code is 201", function () {
     expect(res.getStatus()).to.equal(201);
   });
+  test("Response body is not null", function () {
+    expect(res.getBody()).to.not.be.null;
+  });
 }
 
 script:post-response {
   const data = res.getBody();
-  if (res.getStatus() === 201 && data && data.id) {
-    bru.setEnvVar("cartItemId", String(data.id), { persist: true });
+  if (res.getStatus() === 201 && data) {
+    // API returns the full cart: { id, items: [{ id, productId, ... }], total }
+    const itemId = data.id || (data.items && data.items[0] && data.items[0].id);
+    if (itemId) {
+      bru.setVar("cartItemId", String(itemId));
+      bru.setEnvVar("cartItemId", String(itemId));
+    }
   }
 }

@@ -16,13 +16,17 @@ headers {
 
 body:json {
   {
-    "email": "unknown@example.com",
-    "password": "password123"
+    "email": "nobody@unknown-domain-xyz.com",
+    "password": "irrelevant"
   }
 }
 
 tests {
   test("Status code is 401", function () {
     expect(res.getStatus()).to.equal(401);
+  });
+  test("Response has error message", function () {
+    const body = res.getBody();
+    expect(body.error || body.message).to.be.a("string");
   });
 }

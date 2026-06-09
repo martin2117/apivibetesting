@@ -19,4 +19,12 @@ tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
   });
+  test("Cart has items array", function () {
+    expect(res.getBody()).to.have.property("items");
+    expect(res.getBody().items).to.be.an("array");
+  });
+  test("Cart has numeric total", function () {
+    expect(res.getBody()).to.have.property("total");
+    expect(res.getBody().total).to.be.a("number");
+  });
 }

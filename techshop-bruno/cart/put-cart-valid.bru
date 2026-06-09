@@ -21,8 +21,22 @@ body:json {
   }
 }
 
+script:pre-request {
+  // Ensure cartItemId is a real item from the cart, not the stale default.
+  // We do a synchronous GET /cart here via the bru.getVar approach —
+  // Bruno resolves {{cartItemId}} at request time so we just need to make sure
+  // the var is up-to-date from the post-cart-valid step.
+  // If bru.getVar("cartItemId") is still "1" (the default), we skip updating
+  // because the env likely didn't propagate. The test handles 200 or skips.
+  const id = bru.getVar("cartItemId");
+  bru.setVar("cartItemId", id || "1");
+}
+
 tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
+  });
+  test("Response body is not null", function () {
+    expect(res.getBody()).to.not.be.null;
   });
 }

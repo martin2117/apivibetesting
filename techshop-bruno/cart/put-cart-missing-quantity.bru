@@ -23,4 +23,9 @@ tests {
   test("Status code is 400", function () {
     expect(res.getStatus()).to.equal(400);
   });
+
+  test("Response has error message", function () {
+    const body = res.getBody();
+    expect(body.error || body.message).to.be.a("string");
+  });
 }

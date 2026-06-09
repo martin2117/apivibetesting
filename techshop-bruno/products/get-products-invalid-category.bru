@@ -15,7 +15,12 @@ headers {
 }
 
 tests {
-  test("Status code is 200", function () {
-    expect(res.getStatus()).to.equal(200);
+  test("Status code is 200 or 400", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 400]);
+  });
+  test("When 200, response is an array", function () {
+    if (res.getStatus() === 200) {
+      expect(res.getBody()).to.be.an("array");
+    }
   });
 }

@@ -41,4 +41,17 @@ tests {
   test("Status code is 201", function () {
     expect(res.getStatus()).to.equal(201);
   });
+  test("Order has id starting with ORD-", function () {
+    const order = res.getBody();
+    expect(order.id).to.be.a("string");
+    expect(order.id).to.match(/^ORD-/);
+  });
+  test("Order has status and total", function () {
+    const order = res.getBody();
+    expect(order).to.have.property("status");
+    expect(order).to.have.property("total");
+  });
+  test("Payment response has last4", function () {
+    expect(res.getBody().payment).to.have.property("last4");
+  });
 }

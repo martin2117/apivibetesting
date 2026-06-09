@@ -19,4 +19,20 @@ tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
   });
+  test("Response is an array", function () {
+    expect(res.getBody()).to.be.an("array");
+  });
+  test("When orders exist, each has required schema fields", function () {
+    res.getBody().forEach(function (order) {
+      expect(order).to.have.property("id");
+      expect(order).to.have.property("userId");
+      expect(order).to.have.property("items");
+      expect(order).to.have.property("total");
+      expect(order).to.have.property("status");
+      expect(order).to.have.property("createdAt");
+      expect(order).to.have.property("shipping");
+      expect(order).to.have.property("payment");
+      expect(order.payment).to.have.property("last4");
+    });
+  });
 }

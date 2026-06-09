@@ -6,6 +6,8 @@ vars:pre-request {
   baseUrl: http://localhost:3000
   authToken:
   cartItemId: 1
+  TEST_EMAIL: demo@techshop.com
+  TEST_PASSWORD: password123
 }
 
 script:pre-request {
@@ -13,6 +15,8 @@ script:pre-request {
   bru.setVar("baseUrl", baseUrl);
   bru.setVar("cartItemId", String(bru.getEnvVar("cartItemId") || bru.getVar("cartItemId") || "1"));
   bru.setVar("authToken", bru.getEnvVar("authToken") || bru.getVar("authToken") || "");
+  bru.setVar("TEST_EMAIL", bru.getEnvVar("TEST_EMAIL") || bru.getVar("TEST_EMAIL") || "demo@techshop.com");
+  bru.setVar("TEST_PASSWORD", bru.getEnvVar("TEST_PASSWORD") || bru.getVar("TEST_PASSWORD") || "password123");
 }
 
 headers {

@@ -16,8 +16,8 @@ headers {
 
 body:json {
   {
-    "email": "demo@techshop.com",
-    "password": "password123"
+    "email": "{{TEST_EMAIL}}",
+    "password": "{{TEST_PASSWORD}}"
   }
 }
 
@@ -25,11 +25,20 @@ tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
   });
+  test("Response has token field", function () {
+    expect(res.getBody()).to.have.property("token");
+  });
+  test("Response has user field with id, email, name", function () {
+    const user = res.getBody().user;
+    expect(user).to.have.property("id");
+    expect(user).to.have.property("email");
+    expect(user).to.have.property("name");
+  });
 }
 
 script:post-response {
   const data = res.getBody();
   if (res.getStatus() === 200 && data && data.token) {
-    bru.setEnvVar("authToken", data.token, { persist: true });
+    bru.setVar("authToken", data.token);
   }
 }

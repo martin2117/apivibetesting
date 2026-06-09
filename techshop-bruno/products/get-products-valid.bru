@@ -1,7 +1,7 @@
 meta {
   name: Get Products Valid
   type: http
-  seq: 8
+  seq: 1
 }
 
 get {
@@ -17,5 +17,19 @@ headers {
 tests {
   test("Status code is 200", function () {
     expect(res.getStatus()).to.equal(200);
+  });
+  test("Response is a non-empty array", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array").with.length.above(0);
+  });
+  test("Each product has required schema fields", function () {
+    res.getBody().forEach(function (p) {
+      expect(p).to.have.property("id");
+      expect(p).to.have.property("name");
+      expect(p).to.have.property("price");
+      expect(p).to.have.property("category");
+      expect(p).to.have.property("stock");
+      expect(p).to.have.property("inStock");
+    });
   });
 }

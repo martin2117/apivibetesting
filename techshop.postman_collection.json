@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "2f7ce5ee-1372-4e6b-bce9-bbb0572ab23a",
     "name": "TechShop API Tests",
-    "description": "API tests for TechShop e-commerce API. Run Auth → POST login happy path first to set authToken. Based on swagger.json and TEST_IDEAS.md.",
+    "description": "API tests for TechShop e-commerce API. Run Auth \u2192 POST login happy path first to set authToken. Based on swagger.json and TEST_IDEAS.md.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "createdAt": "2026-06-01T14:50:40.000Z",
     "updatedAt": "2026-06-01T14:55:36.000Z",
@@ -14,7 +14,7 @@
       "name": "Auth",
       "item": [
         {
-          "name": "POST login — happy path",
+          "name": "POST login \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -28,6 +28,13 @@
                   "pm.collectionVariables.set(\"authToken\", json.token);",
                   "pm.test(\"Response contains token\", function () {",
                   "    pm.expect(json.token).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user with id, email, name\", function () {",
+                  "    var user = pm.response.json().user;",
+                  "    pm.expect(user).to.have.property(\"id\");",
+                  "    pm.expect(user).to.have.property(\"email\");",
+                  "    pm.expect(user).to.have.property(\"name\");",
                   "});"
                 ]
               }
@@ -47,7 +54,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"demo@techshop.com\",\n  \"password\": \"password123\"\n}",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\",\n  \"password\": \"{{TEST_PASSWORD}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -62,7 +69,7 @@
           "uid": "13027673-bcd5a68f-e61c-461f-ba1c-18f4b98703ec"
         },
         {
-          "name": "POST login — wrong password",
+          "name": "POST login \u2014 wrong password",
           "event": [
             {
               "listen": "test",
@@ -90,7 +97,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"demo@techshop.com\",\n  \"password\": \"wrongpassword\"\n}",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\",\n  \"password\": \"wrongpassword\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -105,7 +112,7 @@
           "uid": "13027673-5cf293d7-697b-4f2e-9db1-177fca22f329"
         },
         {
-          "name": "POST login — missing email",
+          "name": "POST login \u2014 missing email",
           "event": [
             {
               "listen": "test",
@@ -133,7 +140,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"password\": \"password123\"\n}",
+              "raw": "{\n  \"password\": \"{{TEST_PASSWORD}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -148,7 +155,7 @@
           "uid": "13027673-993ce121-ac4d-4516-a751-2af35712cd9b"
         },
         {
-          "name": "POST login — missing password",
+          "name": "POST login \u2014 missing password",
           "event": [
             {
               "listen": "test",
@@ -176,7 +183,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"demo@techshop.com\"\n}",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -191,7 +198,7 @@
           "uid": "13027673-0b168a1c-46ab-4986-a0f1-3d2d191742c3"
         },
         {
-          "name": "POST login — empty body",
+          "name": "POST login \u2014 empty body",
           "event": [
             {
               "listen": "test",
@@ -234,7 +241,7 @@
           "uid": "13027673-5a02d8ee-a88b-4cf1-adda-7cff4d1ca1b5"
         },
         {
-          "name": "POST login — unknown user",
+          "name": "POST login \u2014 unknown user",
           "event": [
             {
               "listen": "test",
@@ -262,7 +269,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"unknown@example.com\",\n  \"password\": \"password123\"\n}",
+              "raw": "{\n  \"email\": \"unknown@example.com\",\n  \"password\": \"{{TEST_PASSWORD}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -286,7 +293,7 @@
       "name": "Products",
       "item": [
         {
-          "name": "GET all products — happy path",
+          "name": "GET all products \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -295,7 +302,8 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -320,7 +328,7 @@
           "uid": "13027673-4674a234-e5f8-4c25-9450-e0966aab2cf1"
         },
         {
-          "name": "GET products — invalid category",
+          "name": "GET products \u2014 invalid category",
           "event": [
             {
               "listen": "test",
@@ -329,6 +337,13 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"When 200, response is an array\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData).to.be.an(\"array\");",
+                  "    }",
                   "});"
                 ]
               }
@@ -354,7 +369,7 @@
           "uid": "13027673-51a7dd73-20fa-483a-876c-20ce1451029f"
         },
         {
-          "name": "GET products — unsupported query param",
+          "name": "GET products \u2014 unsupported query param",
           "event": [
             {
               "listen": "test",
@@ -363,6 +378,13 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"When 200, response is an array\", function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData).to.be.an(\"array\");",
+                  "    }",
                   "});"
                 ]
               }
@@ -388,7 +410,7 @@
           "uid": "13027673-bb9c3596-40ea-4e43-bd71-75bdd95e861d"
         },
         {
-          "name": "POST /products — method not allowed",
+          "name": "POST /products \u2014 method not allowed",
           "event": [
             {
               "listen": "test",
@@ -397,6 +419,11 @@
                 "exec": [
                   "pm.test(\"Status code is 405\", function () {",
                   "    pm.response.to.have.status(405);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -431,7 +458,7 @@
           "uid": "13027673-a228c7b0-8f40-48b4-b828-9622a783a270"
         },
         {
-          "name": "GET product by ID — happy path",
+          "name": "GET product by ID \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -440,7 +467,8 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -465,7 +493,7 @@
           "uid": "13027673-dc5b6441-793d-422e-a12a-5bca205fe7ff"
         },
         {
-          "name": "GET product — non-existent ID",
+          "name": "GET product \u2014 non-existent ID",
           "event": [
             {
               "listen": "test",
@@ -474,6 +502,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -499,7 +532,7 @@
           "uid": "13027673-7d3e7695-b661-44b4-b8e2-9bbd19748afd"
         },
         {
-          "name": "GET product — invalid ID (abc)",
+          "name": "GET product \u2014 invalid ID (abc)",
           "event": [
             {
               "listen": "test",
@@ -508,6 +541,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -533,7 +571,7 @@
           "uid": "13027673-be99e8e4-af56-43e4-a495-815f6e08874c"
         },
         {
-          "name": "GET product — invalid ID (-1)",
+          "name": "GET product \u2014 invalid ID (-1)",
           "event": [
             {
               "listen": "test",
@@ -542,6 +580,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -576,7 +619,7 @@
       "name": "Cart",
       "item": [
         {
-          "name": "GET cart — happy path",
+          "name": "GET cart \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -585,7 +628,8 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -614,7 +658,7 @@
           "uid": "13027673-603fcf9c-9017-4c9e-b8f0-d37bf5c16268"
         },
         {
-          "name": "GET cart — no Authorization",
+          "name": "GET cart \u2014 no Authorization",
           "event": [
             {
               "listen": "test",
@@ -623,6 +667,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -648,7 +697,7 @@
           "uid": "13027673-8a16c7eb-8707-4a6d-b914-8c4e9eb1caa6"
         },
         {
-          "name": "GET cart — invalid token",
+          "name": "GET cart \u2014 invalid token",
           "event": [
             {
               "listen": "test",
@@ -657,6 +706,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -686,7 +740,7 @@
           "uid": "13027673-63da7234-c2f5-4982-9a66-f60fedd25578"
         },
         {
-          "name": "GET cart — malformed Authorization",
+          "name": "GET cart \u2014 malformed Authorization",
           "event": [
             {
               "listen": "test",
@@ -695,6 +749,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -724,7 +783,7 @@
           "uid": "13027673-22e75794-8ff0-418d-ae6d-2557fb7f3998"
         },
         {
-          "name": "POST cart — add item happy path",
+          "name": "POST cart \u2014 add item happy path",
           "event": [
             {
               "listen": "test",
@@ -735,7 +794,8 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "var json = pm.response.json();",
-                  "if (json && json.id) { pm.collectionVariables.set(\"cartItemId\", String(json.id)); }"
+                  "if (json && json.id) { pm.collectionVariables.set(\"cartItemId\", String(json.id)); }",
+                  ""
                 ]
               }
             }
@@ -773,7 +833,7 @@
           "uid": "13027673-685b37ac-3f89-4603-83ef-3ce43a8393d4"
         },
         {
-          "name": "POST cart — no auth",
+          "name": "POST cart \u2014 no auth",
           "event": [
             {
               "listen": "test",
@@ -782,6 +842,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -816,7 +881,7 @@
           "uid": "13027673-c001443b-fd32-4426-8855-312adcf3171b"
         },
         {
-          "name": "POST cart — product not found",
+          "name": "POST cart \u2014 product not found",
           "event": [
             {
               "listen": "test",
@@ -825,6 +890,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -863,7 +933,7 @@
           "uid": "13027673-245e50b4-b19e-4bbc-bd11-0e24a6b9ac6a"
         },
         {
-          "name": "POST cart — quantity zero",
+          "name": "POST cart \u2014 quantity zero",
           "event": [
             {
               "listen": "test",
@@ -872,6 +942,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -910,7 +985,7 @@
           "uid": "13027673-3d15d1b8-b01a-4e7d-9eac-c28531c74990"
         },
         {
-          "name": "POST cart — missing productId",
+          "name": "POST cart \u2014 missing productId",
           "event": [
             {
               "listen": "test",
@@ -919,6 +994,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -957,7 +1037,7 @@
           "uid": "13027673-e1479fbd-64aa-4161-bb0a-b0e811e8cf2c"
         },
         {
-          "name": "POST cart — non-integer productId",
+          "name": "POST cart \u2014 non-integer productId",
           "event": [
             {
               "listen": "test",
@@ -966,6 +1046,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1004,7 +1089,7 @@
           "uid": "13027673-049c0c43-26d0-48dc-a58a-03ded59975f7"
         },
         {
-          "name": "PUT cart item — update quantity",
+          "name": "PUT cart item \u2014 update quantity",
           "event": [
             {
               "listen": "test",
@@ -1013,6 +1098,11 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response body is not null\", function () {",
+                  "    pm.expect(jsonData).to.not.be.null;",
                   "});"
                 ]
               }
@@ -1051,7 +1141,7 @@
           "uid": "13027673-0b661881-3557-4f5f-83c6-93d77d10f5af"
         },
         {
-          "name": "PUT cart item — no auth",
+          "name": "PUT cart item \u2014 no auth",
           "event": [
             {
               "listen": "test",
@@ -1060,6 +1150,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1094,7 +1189,7 @@
           "uid": "13027673-2bb3ae26-4fe8-4b4b-a55a-83ae472c13dd"
         },
         {
-          "name": "PUT cart item — not found",
+          "name": "PUT cart item \u2014 not found",
           "event": [
             {
               "listen": "test",
@@ -1103,6 +1198,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1141,7 +1241,7 @@
           "uid": "13027673-8d96cc38-04c5-40c0-a6b2-d55eca6c3114"
         },
         {
-          "name": "PUT cart item — quantity zero",
+          "name": "PUT cart item \u2014 quantity zero",
           "event": [
             {
               "listen": "test",
@@ -1150,6 +1250,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1188,7 +1293,7 @@
           "uid": "13027673-4cf5f21e-18d0-48f4-975a-90ed363f2351"
         },
         {
-          "name": "PUT cart item — missing quantity",
+          "name": "PUT cart item \u2014 missing quantity",
           "event": [
             {
               "listen": "test",
@@ -1197,6 +1302,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1235,7 +1345,7 @@
           "uid": "13027673-23d0c498-5853-4c85-b7f7-c667f8628c70"
         },
         {
-          "name": "DELETE cart item — happy path",
+          "name": "DELETE cart item \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -1244,7 +1354,8 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -1273,7 +1384,7 @@
           "uid": "13027673-f4315307-7c3b-4a1d-b8c5-84ef3f070c55"
         },
         {
-          "name": "DELETE cart item — no auth",
+          "name": "DELETE cart item \u2014 no auth",
           "event": [
             {
               "listen": "test",
@@ -1282,6 +1393,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1307,7 +1423,7 @@
           "uid": "13027673-b9b2d0c1-b4c6-489f-b89d-39d2c2dc75cd"
         },
         {
-          "name": "DELETE cart item — not found",
+          "name": "DELETE cart item \u2014 not found",
           "event": [
             {
               "listen": "test",
@@ -1316,6 +1432,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1345,7 +1466,7 @@
           "uid": "13027673-59fe52f6-7a77-4bf4-b01a-2ab5a8e2c170"
         },
         {
-          "name": "DELETE cart item — invalid itemId",
+          "name": "DELETE cart item \u2014 invalid itemId",
           "event": [
             {
               "listen": "test",
@@ -1354,6 +1475,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1383,7 +1509,7 @@
           "uid": "13027673-a7faac5b-3af6-4659-95cc-6d391f24f75e"
         },
         {
-          "name": "DELETE cart item — second delete (not found)",
+          "name": "DELETE cart item \u2014 second delete (not found)",
           "event": [
             {
               "listen": "test",
@@ -1392,6 +1518,11 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () {",
                   "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1421,7 +1552,7 @@
           "uid": "13027673-917c1e2d-bafd-49e4-952f-6061bd92e8f5"
         },
         {
-          "name": "POST cart — missing quantity",
+          "name": "POST cart \u2014 missing quantity",
           "event": [
             {
               "listen": "test",
@@ -1429,6 +1560,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1474,7 +1610,7 @@
       "name": "Orders",
       "item": [
         {
-          "name": "GET orders — happy path",
+          "name": "GET orders \u2014 happy path",
           "event": [
             {
               "listen": "test",
@@ -1483,7 +1619,8 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -1512,7 +1649,7 @@
           "uid": "13027673-6bddde22-72e5-41e2-8507-7a7524e81219"
         },
         {
-          "name": "GET orders — no Authorization",
+          "name": "GET orders \u2014 no Authorization",
           "event": [
             {
               "listen": "test",
@@ -1521,6 +1658,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1546,7 +1688,7 @@
           "uid": "13027673-8879106a-2402-4e63-8312-e9a12d8039a7"
         },
         {
-          "name": "GET orders — invalid token",
+          "name": "GET orders \u2014 invalid token",
           "event": [
             {
               "listen": "test",
@@ -1555,6 +1697,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1584,7 +1731,7 @@
           "uid": "13027673-ec426dc2-912b-4160-902b-2f1a9983499d"
         },
         {
-          "name": "GET orders — empty array (no orders yet)",
+          "name": "GET orders \u2014 empty array (no orders yet)",
           "event": [
             {
               "listen": "test",
@@ -1596,6 +1743,11 @@
                   "});",
                   "pm.test(\"Response is an array\", function () {",
                   "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response is an array (empty or non-empty)\", function () {",
+                  "    pm.expect(jsonData).to.be.an(\"array\");",
                   "});"
                 ]
               }
@@ -1625,7 +1777,7 @@
           "uid": "13027673-1c298e21-2f91-445b-af60-952c999c9981"
         },
         {
-          "name": "POST order — checkout happy path",
+          "name": "POST order \u2014 checkout happy path",
           "event": [
             {
               "listen": "test",
@@ -1634,7 +1786,8 @@
                 "exec": [
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
-                  "});"
+                  "});",
+                  ""
                 ]
               }
             }
@@ -1672,7 +1825,7 @@
           "uid": "13027673-bc8fd2cd-b682-4934-86c8-d7066a1e88d3"
         },
         {
-          "name": "POST order — no auth",
+          "name": "POST order \u2014 no auth",
           "event": [
             {
               "listen": "test",
@@ -1681,6 +1834,11 @@
                 "exec": [
                   "pm.test(\"Status code is 401\", function () {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1715,7 +1873,7 @@
           "uid": "13027673-7bd3b7be-4be3-496c-b9e5-5679b5a3f476"
         },
         {
-          "name": "POST order — missing shipping",
+          "name": "POST order \u2014 missing shipping",
           "event": [
             {
               "listen": "test",
@@ -1724,6 +1882,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1762,7 +1925,7 @@
           "uid": "13027673-13df2657-6a80-4e14-be09-21bfdece84e2"
         },
         {
-          "name": "POST order — empty items array",
+          "name": "POST order \u2014 empty items array",
           "event": [
             {
               "listen": "test",
@@ -1771,6 +1934,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1809,7 +1977,7 @@
           "uid": "13027673-efd7b618-e612-47a6-ad29-3e004b610994"
         },
         {
-          "name": "POST order — invalid phone",
+          "name": "POST order \u2014 invalid phone",
           "event": [
             {
               "listen": "test",
@@ -1818,6 +1986,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1856,7 +2029,7 @@
           "uid": "13027673-11a54264-317e-448e-8875-2587e489f28a"
         },
         {
-          "name": "POST order — invalid card number",
+          "name": "POST order \u2014 invalid card number",
           "event": [
             {
               "listen": "test",
@@ -1865,6 +2038,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1903,7 +2081,7 @@
           "uid": "13027673-0e317082-0869-4fd6-8e2d-61838fcc3754"
         },
         {
-          "name": "POST order — past expiry date",
+          "name": "POST order \u2014 past expiry date",
           "event": [
             {
               "listen": "test",
@@ -1912,6 +2090,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1950,7 +2133,7 @@
           "uid": "13027673-cf008d34-fa23-4eac-908e-992ef112b0f2"
         },
         {
-          "name": "POST order — invalid cvv",
+          "name": "POST order \u2014 invalid cvv",
           "event": [
             {
               "listen": "test",
@@ -1959,6 +2142,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -1997,7 +2185,7 @@
           "uid": "13027673-e38f88eb-c90e-4b51-8a2f-03623a113b47"
         },
         {
-          "name": "POST order — invalid email",
+          "name": "POST order \u2014 invalid email",
           "event": [
             {
               "listen": "test",
@@ -2006,6 +2194,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -2044,7 +2237,7 @@
           "uid": "13027673-3dfb98f5-6345-4ef2-a839-918ccb5ef414"
         },
         {
-          "name": "POST order — line item quantity zero",
+          "name": "POST order \u2014 line item quantity zero",
           "event": [
             {
               "listen": "test",
@@ -2053,6 +2246,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -2091,7 +2289,7 @@
           "uid": "13027673-0be739a5-7f14-4955-b7c7-2a7e65505fb2"
         },
         {
-          "name": "POST order — non-existent productId",
+          "name": "POST order \u2014 non-existent productId",
           "event": [
             {
               "listen": "test",
@@ -2100,6 +2298,11 @@
                 "exec": [
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Response has error or message field\", function () {",
+                  "    pm.expect(jsonData.error || jsonData.message).to.be.a(\"string\");",
                   "});"
                 ]
               }
@@ -2156,6 +2359,18 @@
     {
       "key": "cartItemId",
       "value": "1"
+    },
+    {
+      "key": "TEST_EMAIL",
+      "value": "demo@techshop.com",
+      "type": "string",
+      "description": "Test account email"
+    },
+    {
+      "key": "TEST_PASSWORD",
+      "value": "password123",
+      "type": "string",
+      "description": "Test account password"
     }
   ]
 }
